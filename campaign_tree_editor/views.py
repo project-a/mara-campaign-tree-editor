@@ -30,9 +30,9 @@ def index_page():
                 id='campaign-tree-card',
                 header_left=_.span['First ', _.b['search'], ' to select campaigns, then ',
                                    _.b['edit'], ' all campaigns of the search result'],
-                header_right=_.span[bootstrap.button(url='#', label='Start editing', icon='edit',
-                                                     title='Edit levels for selected campaign codes',
-                                                     id='edit-button')],
+                header_right=_.span(id="edit-mode")[
+                        _.button(type='button', _class="btn btn-success", onclick='campaignTree.startEdit()')[
+                            'Start Editing']],
                 sections=[
                     [_.p['Match results: ',
                          _.label(class_="radio-inline")[
@@ -64,8 +64,10 @@ def index_page():
                                 [_.input(placeholder='Campaign code')[' ']],
                         rows=[])]),
             _.script['''
+var campaignTree = null;
+
 document.addEventListener('DOMContentLoaded', function() {
-    var campaignTree = new CampaignTree("'''
+    campaignTree = new CampaignTree("'''
                      + flask.url_for('campaign_tree.index_page') + '''", '''
                      + json.dumps(config.levels()) + ''');
 });'''],

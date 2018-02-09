@@ -101,6 +101,8 @@ WHERE TRUE '''
                 query += f""" {sort_columns}"""
             else:
                 query += f""", {sort_columns}"""
+    #  Add limit
+    query += f""" LIMIT {request["limit"]}"""
 
     with mara_db.sqlalchemy.postgres_cursor_context(
             mara_db.config.mara_db_alias()) as cursor:  # type: psycopg2.extensions.cursor
