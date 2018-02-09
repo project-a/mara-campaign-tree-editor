@@ -5,7 +5,7 @@ import json
 import flask
 from mara_page import acl, navigation, response, _, bootstrap, html
 
-from app.campaign_tree import config, campaign_tree
+from campaign_tree_editor import config, campaign_tree
 
 blueprint = flask.Blueprint('campaign_tree', __name__, static_folder='static', url_prefix='/campaign-tree')
 

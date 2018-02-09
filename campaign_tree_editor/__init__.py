@@ -1,4 +1,4 @@
-from app.campaign_tree import config, campaign_tree, views
+from campaign_tree_editor import config, campaign_tree, views
 
 MARA_CONFIG_MODULES = [config]
 

@@ -3,7 +3,7 @@ import psycopg2.extensions
 import sqlalchemy
 from sqlalchemy.ext.declarative import declarative_base
 import io, os
-from campaign_tree import config
+from campaign_tree_editor import config
 
 Base = declarative_base()
 

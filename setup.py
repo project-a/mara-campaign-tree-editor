@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='mara-campaign-tree-editor',
+    name='campaign-tree-editor',
     version='1.0.0',
 
     description="Tool to find and edit marketing campaign names",

@@ -1,2 +1,2 @@
-# Mara Campaign Tree Editor
+# Campaign Tree Editor
 
