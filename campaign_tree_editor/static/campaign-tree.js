@@ -21,7 +21,7 @@ var CampaignTree = function (baseUrl, levels) {
         for (var i = 0; i < filters.length; i++) {
             filters[i] = '';
         }
-        console.log(limit);
+
         // get values
         var request = {
             'filters': filters,
@@ -92,7 +92,8 @@ var CampaignTree = function (baseUrl, levels) {
 
             var tr = $('<tr/>');
             for (var levelKey in row[0]) {
-                tr.append($('<td/>').append(row[0][levelKey]));
+                var cellContent =$('<td class="data-col" data-type="' + levels[levelKey] + '"><a href="javascript:void(0)">' + row[0][levelKey] + '</a></td>');
+                tr.append(cellContent);
             }
             tr.append($('<td/>').append(row[1]));
             trs.push(tr);
@@ -102,7 +103,7 @@ var CampaignTree = function (baseUrl, levels) {
         $('#campaign-tree-table tbody').empty().append(trs);
 
         // Bind row events for search mode
-        // bindRowEvents();
+         bindRowEvents();
     }
 
     // Display results from the search query
@@ -127,7 +128,7 @@ var CampaignTree = function (baseUrl, levels) {
 
     // Remove search term for level and start a new search
     var clearSearchLevel = function (level) {
-        $('#search-' + level).val('');
+        $('#' + level).val('');
         updateClearButtons();
         search();
     };
@@ -152,7 +153,7 @@ var CampaignTree = function (baseUrl, levels) {
         var editAble = levels;
         for (var level in editAble) {
             (function (l) {
-                $('#search-' + l).keyup(function () {
+                $('#' + l).keyup(function () {
                     var inp = $(this).val();
                     $(this).val(inp.replace(/\|,|\.|;|\?/g, ''));
                     $('.data-col[data-type="' + l + '"]').html($(this).val());
@@ -169,7 +170,7 @@ var CampaignTree = function (baseUrl, levels) {
 // Start search when clicking on a cell
     var bindRowEvents = function () {
         $('.data-col').click(function () {
-            $('#search-' + $(this).attr('data-type')).val($(this).text());
+            $('#' + $(this).attr('data-type')).val($(this).text());
             updateClearButtons();
             search();
         });
@@ -182,7 +183,7 @@ var CampaignTree = function (baseUrl, levels) {
 
     var updateClearButtons = function () {
         $('.input-icon').each(function () {
-            if ($('#search-' + $(this).attr('data-level')).val()) {
+            if ($('#' + $(this).attr('data-level')).val()) {
                 $(this).html('<a href="javascript:campaignTree.clearSearchLevel(\'' + $(this).attr('data-level') + '\')"><span class="icon-remove" style="opacity: 0.5;"> </span></a>');
             } else {
                 $(this).html('&nbsp;&nbsp;');
@@ -252,25 +253,42 @@ var CampaignTree = function (baseUrl, levels) {
     };
 
 
+    var displayChange = function (data) {
+        //show the warnings and messages
+        console.log(data);
+    };
 // Save changes from edit mode
     var saveEdit = function () {
+        var empty_filters = new Array(levels.length);
+        var empty_changes = new Array(levels.length);
+        for (var i = 0; i < empty_filters.length; i++) {
+            empty_filters[i] = '';
+            empty_changes[i] = '';
+        }
+
         var request = {
-            'filters': {},
+            'filters': empty_filters,
             'search-mode': $('input[name="searchOptions"]:checked').val(),
-            'changes': {}
+            'changes': empty_changes
         };
 
         for (var level in levels) {
-            request['filters'][levels[level]] = $('#search-' + levels[level]).attr('data-val');
-            request['changes'][levels[level]] = $('#search-' + levels[level]).val();
+            request['filters'][level] = $('#' + levels[level]).attr('data-val');
+            request['changes'][level] = $('#' + levels[level]).val();
         }
-
+        console.log(request);
         // Send both as POST parameters to the save action
-        $('#data').val(JSON.stringify(request));
-        $('#save').submit();
+        $.ajax({
+            type: "POST",
+            url: baseUrl + '/save',
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(request),
+            success: displayChange,
+            dataType: 'json'
+        });
     };
 
-    $('.level-input').unbind().keyup(function () {
+    $('.search-col').unbind().keyup(function () {
         search();
     });
     $('input[name="sortOptions"]').unbind().change(function () {

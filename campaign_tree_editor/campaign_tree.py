@@ -133,6 +133,46 @@ WHERE TRUE '''
         return cursor.fetchall() or []
 
 
+def save(request):
+    """Search campaigns either on exact or fuzzy(ilike) matching and order results by touchpoint count"""
+    query = '''
+    UPDATE campaign_tree
+    '''
+
+    first = True
+    for index,change in enumerate(request["changes"]):
+        if change:
+            if first:
+                query += f"""
+        SET levels[{index + 1}] = '{change}'"""
+                first = False
+            else:
+                query += f"""
+        , levels[{index + 1}] = '{change}'"""
+
+    query += '''
+     WHERE TRUE 
+    '''
+
+    if request["search-mode"] == 'fuzzy':  # searching
+        for index, search in enumerate(request["filters"]):
+            if search:
+                query += f"""
+    AND levels[{index + 1}] ILIKE '%{search}%'"""
+    else:  # exact
+        for index, search in enumerate(request["filters"]):
+            if search:
+                query += f"""
+    AND levels[{index + 1}] = '{search}'"""
+    print(query)
+
+    with mara_db.sqlalchemy.postgres_cursor_context(
+            mara_db.config.mara_db_alias()) as cursor:  # type: psycopg2.extensions.cursor
+        cursor.execute(query)
+        print(cursor)
+        return cursor.description or []
+
+
 if __name__ == "__main__":
     import app
 

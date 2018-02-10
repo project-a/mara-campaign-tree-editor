@@ -31,8 +31,8 @@ def index_page():
                 header_left=_.span['First ', _.b['search'], ' to select campaigns, then ',
                                    _.b['edit'], ' all campaigns of the search result'],
                 header_right=_.span(id="edit-mode")[
-                        _.button(type='button', _class="btn btn-success", onclick='campaignTree.startEdit()')[
-                            'Start Editing']],
+                    _.button(type='button', _class="btn btn-success", onclick='campaignTree.startEdit()')[
+                        'Start Editing']],
                 sections=[
                     [_.p['Match results: ',
                          _.label(class_="radio-inline")[
@@ -57,12 +57,14 @@ def index_page():
                          _.input(type='checkbox', name="sortOptions", id='sort-number_of_clicks_all_time',
                                  value='number_of_clicks_all_time')[
                              '# Clicks all time']]],
-                    bootstrap.table(
+                    _.div(class_='input-group'),bootstrap.table(
                         id='campaign-tree-table',
-                        headers=[_.input(id=level, class_='level-input', placeholder=level)[' '] for level in
-                                 config.levels()] +
+                        headers=[_.input(id=level, class_='form-control search-col editable',
+                                         type='text', data_level=level, placeholder=level)[' '] for
+                                 level in config.levels()] +
                                 [_.input(placeholder='Campaign code')[' ']],
-                        rows=[])]),
+                        rows=[])
+                ]),
             _.script['''
 var campaignTree = null;
 
@@ -84,3 +86,8 @@ def search():
 @acl.require_permission(acl_resource)
 def count():
     return flask.jsonify(campaign_tree.count(flask.request.get_json()))
+
+@blueprint.route('/save', methods=['POST'])
+@acl.require_permission(acl_resource)
+def save():
+    return flask.jsonify(campaign_tree.save(flask.request.get_json()))
