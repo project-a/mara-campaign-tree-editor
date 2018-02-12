@@ -94,4 +94,8 @@ def count():
 @blueprint.route('/save', methods=['POST'])
 @acl.require_permission(acl_resource)
 def save():
-    return flask.jsonify(campaign_tree.save(flask.request.get_json()))
+    data=campaign_tree.save(flask.request.get_json())
+    flask.flash(
+        "Successfully saved" + str(data[0][7:-1]) + " Campaigns " + " where we " + str(data[1]),
+        category='success')
+    return flask.jsonify(data)

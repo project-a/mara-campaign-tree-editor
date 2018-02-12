@@ -26,7 +26,7 @@ var CampaignTree = function (baseUrl, levels) {
         // get values
         var request = {
             'filters': filters,
-            'campaign_code': null,
+            'campaign_code': '',
             'sort-columns': [],
             'limit': limit,
             'search-mode': $('input[name="searchOptions"]:checked').val()
@@ -77,7 +77,7 @@ var CampaignTree = function (baseUrl, levels) {
         }
         var request = {
             'filters': filters,
-            'campaign_code' : null,
+            'campaign_code' : '',
             'search-mode': $('input[name="searchOptions"]:checked').val()
         };
         for (var level in levels) {
@@ -107,7 +107,6 @@ var CampaignTree = function (baseUrl, levels) {
             var cellContent =$('<td class="data-col" data-type=campaign_code><a href="javascript:void(0)">' + row[1] + '</a></td>');
             tr.append(cellContent);
 
-            tr.append($('<td/>').append(row[1]));
             trs.push(tr);
         }
 
@@ -284,7 +283,7 @@ var CampaignTree = function (baseUrl, levels) {
 
         var request = {
             'filters': empty_filters,
-            'campaign_code': null,
+            'campaign_code': '',
             'search-mode': $('input[name="searchOptions"]:checked').val(),
             'changes': empty_changes
         };
