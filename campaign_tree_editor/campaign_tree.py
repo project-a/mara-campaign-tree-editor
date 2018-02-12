@@ -141,17 +141,19 @@ def save(request):
     '''
 
     first = True
+    change_query=''
     for index, change in enumerate(request["changes"]):
         if change:
             if first:
-                query += f"""
+                change_query += f"""
         SET levels[{index + 1}] = '{change}'"""
                 first = False
             else:
-                query += f"""
+                change_query += f"""
         , levels[{index + 1}] = '{change}'"""
 
-    query += '''
+    query += change_query
+    query +='''
      WHERE TRUE 
     '''
     search_query = build_search_mode_query(request)
@@ -162,7 +164,7 @@ def save(request):
             mara_db.config.mara_db_alias()) as cursor:  # type: psycopg2.extensions.cursor
         cursor.execute(query)
         print(cursor)
-        return cursor.description or []
+        return [cursor.statusmessage or [],change_query]
 
 
 if __name__ == "__main__":

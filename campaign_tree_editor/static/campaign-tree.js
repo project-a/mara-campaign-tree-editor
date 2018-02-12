@@ -256,7 +256,12 @@ var CampaignTree = function (baseUrl, levels) {
     var displayChange = function (data) {
         //show the warnings and messages
         console.log(data);
+        $('#table-title').html('<span style="color: green !important; font-weight: bold;">Successfully saved ' + String(data[0].slice(7,data[0].length)) + ' Campaigns' +
+            ' where we ' + data[1] + ' .</span>');
+        cancelEdit();
+        search();
     };
+
 // Save changes from edit mode
     var saveEdit = function () {
         var empty_filters = new Array(levels.length);

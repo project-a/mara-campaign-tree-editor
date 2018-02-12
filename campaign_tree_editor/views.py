@@ -28,7 +28,7 @@ def index_page():
         html=[
             bootstrap.card(
                 id='campaign-tree-card',
-                header_left=_.span['First ', _.b['search'], ' to select campaigns, then ',
+                header_left=_.span(id="table-title")['First ', _.b['search'], ' to select campaigns, then ',
                                    _.b['edit'], ' all campaigns of the search result'],
                 header_right=_.span(id="edit-mode")[
                     _.button(type='button', _class="btn btn-success", onclick='campaignTree.startEdit()')[
@@ -62,7 +62,8 @@ def index_page():
                         headers=[_.input(id=level, class_='form-control search-col editable',
                                          type='text', data_level=level, placeholder=level)[' '] for
                                  level in config.levels()] +
-                                [_.input(placeholder='Campaign code')[' ']],
+                                [_.input(id='Campaign code', class_='form-control search-col non-editable',
+                                         type='text', data_level='Campaign code',placeholder='Campaign code')[' ']],
                         rows=[])
                 ]),
             _.script['''
