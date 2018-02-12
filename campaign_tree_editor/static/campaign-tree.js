@@ -35,7 +35,6 @@ var CampaignTree = function (baseUrl, levels) {
             request['filters'][level] = $('#' + levels[level]).val();
         }
         request['campaign_code'] = $('#campaign_code').val();
-        console.log(request['campaign_code'])
         for (var i in sortOptions) {
             var option = sortOptions[i];
             if ($('#sort-' + option).prop('checked')) {
