@@ -104,6 +104,9 @@ var CampaignTree = function (baseUrl, levels) {
                 var cellContent =$('<td class="data-col" data-type="' + levels[levelKey] + '"><a href="javascript:void(0)">' + row[0][levelKey] + '</a></td>');
                 tr.append(cellContent);
             }
+            var cellContent =$('<td class="data-col" data-type=campaign_code><a href="javascript:void(0)">' + row[1] + '</a></td>');
+            tr.append(cellContent);
+
             tr.append($('<td/>').append(row[1]));
             trs.push(tr);
         }
@@ -264,7 +267,6 @@ var CampaignTree = function (baseUrl, levels) {
 
     var displayChange = function (data) {
         //show the warnings and messages
-        console.log(data);
         $('#table-title').html('<span style="color: green !important; font-weight: bold;">Successfully saved ' + String(data[0].slice(7,data[0].length)) + ' Campaigns' +
             ' where we ' + data[1] + ' .</span>');
         cancelEdit();
@@ -292,6 +294,8 @@ var CampaignTree = function (baseUrl, levels) {
             request['changes'][level] = $('#' + levels[level]).val();
         }
         request['campaign_code'] = $('#campaign_code').val();
+
+
         // Send both as POST parameters to the save action
         $.ajax({
             type: "POST",

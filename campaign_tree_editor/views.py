@@ -29,7 +29,7 @@ def index_page():
             bootstrap.card(
                 id='campaign-tree-card',
                 header_left=_.span(id="table-title")['First ', _.b['search'], ' to select campaigns, then ',
-                                   _.b['edit'], ' all campaigns of the search result'],
+                                                     _.b['edit'], ' all campaigns of the search result'],
                 header_right=_.span(id="edit-mode")[
                     _.button(type='button', _class="btn btn-success", onclick='campaignTree.startEdit()')[
                         'Start Editing']],
@@ -57,13 +57,15 @@ def index_page():
                          _.input(type='checkbox', name="sortOptions", id='sort-number_of_clicks_all_time',
                                  value='number_of_clicks_all_time')[
                              '# Clicks all time']]],
-                    _.div(class_='input-group'),bootstrap.table(
+                    _.div(class_='input-group'), bootstrap.table(
                         id='campaign-tree-table',
                         headers=[_.input(id=level, class_='form-control search-col editable',
-                                         type='text', data_level=level, placeholder=level)[' '] for
+                                         type='text', data_level=level, style='min-width:90px', placeholder=level)[' ']
+                                 for
                                  level in config.levels()] +
                                 [_.input(id='campaign_code', class_='form-control search-col non-editable',
-                                         type='text', data_level='campaign_code',placeholder='Campaign code')[' ']],
+                                         type='text', data_level='campaign_code', style='min-width:90px',
+                                         placeholder='Campaign code')[' ']],
                         rows=[])
                 ]),
             _.script['''
@@ -87,6 +89,7 @@ def search():
 @acl.require_permission(acl_resource)
 def count():
     return flask.jsonify(campaign_tree.count(flask.request.get_json()))
+
 
 @blueprint.route('/save', methods=['POST'])
 @acl.require_permission(acl_resource)
