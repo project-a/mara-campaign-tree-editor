@@ -76,6 +76,22 @@ def replace_external_sortnames_with_internal(sortcolumn):
             for column in sortcolumn]
 
 
+def build_search_mode_query(request):
+    """builds the search mode query depending on if search is fuzzy or exact"""
+    search_query = ''
+    if request["search-mode"] == 'fuzzy':  # searching
+        for index, search in enumerate(request["filters"]):
+            if search:
+                search_query += f"""
+    AND levels[{index + 1}] ILIKE '%{search}%'"""
+    else:  # exact
+        for index, search in enumerate(request["filters"]):
+            if search:
+                search_query += f"""
+            AND levels[{index + 1}] = '{search}'"""
+    return search_query
+
+
 def search(request):
     """Search campaigns either on exact or fuzzy(ilike) matching and order results by touchpoint count"""
     query = '''
@@ -83,16 +99,8 @@ SELECT levels, campaign_code
 FROM campaign_tree
 WHERE TRUE '''
 
-    if request["search-mode"] == 'fuzzy':  # searching
-        for index, search in enumerate(request["filters"]):
-            if search:
-                query += f"""
-    AND levels[{index + 1}] ILIKE '%{search}%'"""
-    else:  # exact
-        for index, search in enumerate(request["filters"]):
-            if search:
-                query += f"""
-    AND levels[{index + 1}] = '{search}'"""
+    search_query = build_search_mode_query(request)
+    query += search_query
 
     if len(request["sort-columns"]) > 0:  # sorting
         query += """ ORDER BY """
@@ -117,16 +125,9 @@ SELECT Count(campaign_code)
 FROM campaign_tree
 WHERE TRUE '''
 
-    if request["search-mode"] == 'fuzzy':
-        for index, search in enumerate(request["filters"]):
-            if search:
-                query += f"""
-     AND levels[{index + 1}] ILIKE '%{search}%'"""
-    else:  # exact
-        for index, search in enumerate(request["filters"]):
-            if search:
-                query += f"""
-     AND levels[{index + 1}] = '{search}'"""
+    search_query = build_search_mode_query(request)
+    query += search_query
+
     with mara_db.sqlalchemy.postgres_cursor_context(
             mara_db.config.mara_db_alias()) as cursor:  # type: psycopg2.extensions.cursor
         cursor.execute(query)
@@ -140,7 +141,7 @@ def save(request):
     '''
 
     first = True
-    for index,change in enumerate(request["changes"]):
+    for index, change in enumerate(request["changes"]):
         if change:
             if first:
                 query += f"""
@@ -153,17 +154,8 @@ def save(request):
     query += '''
      WHERE TRUE 
     '''
-
-    if request["search-mode"] == 'fuzzy':  # searching
-        for index, search in enumerate(request["filters"]):
-            if search:
-                query += f"""
-    AND levels[{index + 1}] ILIKE '%{search}%'"""
-    else:  # exact
-        for index, search in enumerate(request["filters"]):
-            if search:
-                query += f"""
-    AND levels[{index + 1}] = '{search}'"""
+    search_query = build_search_mode_query(request)
+    query += search_query
     print(query)
 
     with mara_db.sqlalchemy.postgres_cursor_context(
