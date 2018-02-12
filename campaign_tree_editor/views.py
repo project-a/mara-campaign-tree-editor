@@ -62,8 +62,8 @@ def index_page():
                         headers=[_.input(id=level, class_='form-control search-col editable',
                                          type='text', data_level=level, placeholder=level)[' '] for
                                  level in config.levels()] +
-                                [_.input(id='Campaign code', class_='form-control search-col non-editable',
-                                         type='text', data_level='Campaign code',placeholder='Campaign code')[' ']],
+                                [_.input(id='campaign_code', class_='form-control search-col non-editable',
+                                         type='text', data_level='campaign_code',placeholder='Campaign code')[' ']],
                         rows=[])
                 ]),
             _.script['''

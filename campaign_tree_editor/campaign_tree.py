@@ -84,11 +84,15 @@ def build_search_mode_query(request):
             if search:
                 search_query += f"""
     AND levels[{index + 1}] ILIKE '%{search}%'"""
+        if request["campaign_code"]:
+            search_query += f""" AND campaign_code ILIKE '%{request['campaign_code']}%'"""
     else:  # exact
         for index, search in enumerate(request["filters"]):
             if search:
                 search_query += f"""
             AND levels[{index + 1}] = '{search}'"""
+        if request["campaign_code"]:
+            search_query += f""" AND campaign_code = '{request['campaign_code']}'"""
     return search_query
 
 

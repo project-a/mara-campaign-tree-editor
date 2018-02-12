@@ -17,6 +17,7 @@ var CampaignTree = function (baseUrl, levels) {
     function search(limit_) {
         limit = limit_ ? limit_ : defaultLimit;
         //create empty string array
+
         var filters = new Array(levels.length);
         for (var i = 0; i < filters.length; i++) {
             filters[i] = '';
@@ -25,6 +26,7 @@ var CampaignTree = function (baseUrl, levels) {
         // get values
         var request = {
             'filters': filters,
+            'campaign_code': null,
             'sort-columns': [],
             'limit': limit,
             'search-mode': $('input[name="searchOptions"]:checked').val()
@@ -32,7 +34,8 @@ var CampaignTree = function (baseUrl, levels) {
         for (var level in levels) {
             request['filters'][level] = $('#' + levels[level]).val();
         }
-
+        request['campaign_code'] = $('#campaign_code').val();
+        console.log(request['campaign_code'])
         for (var i in sortOptions) {
             var option = sortOptions[i];
             if ($('#sort-' + option).prop('checked')) {
@@ -68,13 +71,19 @@ var CampaignTree = function (baseUrl, levels) {
             .append(spinner()))];
 
         //build request again
+        var filters = new Array(levels.length);
+        for (var i = 0; i < filters.length; i++) {
+            filters[i] = '';
+        }
         var request = {
-            'filters': ['', '', '', '', '', ''],
+            'filters': filters,
+            'campaign_code' : null,
             'search-mode': $('input[name="searchOptions"]:checked').val()
         };
         for (var level in levels) {
             request['filters'][level] = $('#' + levels[level]).val();
         }
+        request['campaign_code'] = $('#campaign_code').val();
 
         currentCountRequest = $.ajax({
             type: "POST",
@@ -273,6 +282,7 @@ var CampaignTree = function (baseUrl, levels) {
 
         var request = {
             'filters': empty_filters,
+            'campaign_code': null,
             'search-mode': $('input[name="searchOptions"]:checked').val(),
             'changes': empty_changes
         };
@@ -281,7 +291,7 @@ var CampaignTree = function (baseUrl, levels) {
             request['filters'][level] = $('#' + levels[level]).attr('data-val');
             request['changes'][level] = $('#' + levels[level]).val();
         }
-        console.log(request);
+        request['campaign_code'] = $('#campaign_code').val();
         // Send both as POST parameters to the save action
         $.ajax({
             type: "POST",
