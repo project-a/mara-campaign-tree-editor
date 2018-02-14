@@ -31,7 +31,7 @@ def index_page():
                 header_left=_.span(id="table-title")['First ', _.b['search'], ' to select campaigns, then ',
                                                      _.b['edit'], ' all campaigns of the search result'],
                 header_right=_.span(id="edit-mode")[
-                    _.button(type='button', _class="btn btn-success", onclick='campaignTree.startEdit()')[
+                    _.button(type='button', class_="btn btn-success", onclick='campaignTree.startEdit()')[
                         'Start Editing']],
                 sections=[
                     [_.p['Match results: ',
