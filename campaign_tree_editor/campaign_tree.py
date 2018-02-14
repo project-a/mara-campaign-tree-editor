@@ -67,6 +67,7 @@ LEFT JOIN dwh_campaign_code cc USING (campaign_code)
 WHERE  cc.campaign_code IS NULL""")
 
         print('done')
+        return True  # this is important for mara ETL
 
 
 def replace_external_sortnames_with_internal(sortcolumn):
@@ -145,7 +146,7 @@ def save(request):
     '''
 
     first = True
-    change_query=''
+    change_query = ''
     for index, change in enumerate(request["changes"]):
         if change:
             if first:
@@ -157,7 +158,7 @@ def save(request):
         , levels[{index + 1}] = '{change}'"""
 
     query += change_query
-    query +='''
+    query += '''
      WHERE TRUE 
     '''
     search_query = build_search_mode_query(request)
@@ -168,7 +169,7 @@ def save(request):
             mara_db.config.mara_db_alias()) as cursor:  # type: psycopg2.extensions.cursor
         cursor.execute(query)
         print(cursor)
-        return [cursor.statusmessage or [],change_query]
+        return [cursor.statusmessage or [], change_query]
 
 
 if __name__ == "__main__":
