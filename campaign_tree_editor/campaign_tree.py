@@ -61,10 +61,11 @@ WHERE cc.campaign_code = ct.campaign_code""")
 
         print('delete disappeared codes')
         cursor.execute("""
-DELETE FROM campaign_tree 
-USING campaign_tree ct
-LEFT JOIN dwh_campaign_code cc USING (campaign_code)
-WHERE  cc.campaign_code IS NULL""")
+WITH current_campaign_codes AS (
+SELECT DISTINCT campaign_code FROM dwh_campaign_code
+)
+DELETE FROM campaign_tree WHERE campaign_code NOT IN current_campaign_codes
+""")
 
         print('done')
         return True  # this is important for mara ETL
