@@ -1,4 +1,4 @@
-import mara_db.sqlalchemy
+import mara_db.postgresql
 import psycopg2.extensions
 import sqlalchemy
 from sqlalchemy.ext.declarative import declarative_base
@@ -23,12 +23,11 @@ def update():
 
     print('get campaign codes with touchpoint counts')
     buf = io.StringIO()
-    with mara_db.sqlalchemy.postgres_cursor_context(
+    with mara_db.postgresql.postgres_cursor_context(
             config.campaign_codes_db_alias()) as cursor:  # type: psycopg2.extensions.cursor
         cursor.copy_to(buf, f"({config.campaign_codes_query()})")
 
-    with mara_db.sqlalchemy.postgres_cursor_context(
-            mara_db.config.mara_db_alias()) as cursor:  # type: psycopg2.extensions.cursor
+    with mara_db.postgresql.postgres_cursor_context('mara') as cursor:  # type: psycopg2.extensions.cursor
         print('write to temporary table')
         cursor.execute("""
 CREATE TEMPORARY TABLE dwh_campaign_code (
@@ -118,8 +117,7 @@ WHERE TRUE '''
     #  Add limit
     query += f""" LIMIT {int(request["limit"])}"""
 
-    with mara_db.sqlalchemy.postgres_cursor_context(
-            mara_db.config.mara_db_alias()) as cursor:  # type: psycopg2.extensions.cursor
+    with mara_db.postgresql.postgres_cursor_context('mara') as cursor:  # type: psycopg2.extensions.cursor
         cursor.execute(query)
         return cursor.fetchall() or []
 
@@ -134,8 +132,7 @@ WHERE TRUE '''
     search_query = build_search_mode_query(request)
     query += search_query
 
-    with mara_db.sqlalchemy.postgres_cursor_context(
-            mara_db.config.mara_db_alias()) as cursor:  # type: psycopg2.extensions.cursor
+    with mara_db.postgresql.postgres_cursor_context('mara') as cursor:  # type: psycopg2.extensions.cursor
         cursor.execute(query)
         return cursor.fetchall() or []
 
@@ -166,10 +163,8 @@ def save(request):
     query += search_query
     print(query)
 
-    with mara_db.sqlalchemy.postgres_cursor_context(
-            mara_db.config.mara_db_alias()) as cursor:  # type: psycopg2.extensions.cursor
+    with mara_db.postgresql.postgres_cursor_context('mara') as cursor:  # type: psycopg2.extensions.cursor
         cursor.execute(query)
-        print(cursor)
         return [cursor.statusmessage or [], change_query]
 
 
