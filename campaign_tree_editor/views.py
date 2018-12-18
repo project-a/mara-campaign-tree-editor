@@ -3,9 +3,9 @@
 import json
 
 import flask
-from mara_page import acl, navigation, response, _, bootstrap, html
-
 from campaign_tree_editor import config, campaign_tree
+
+from mara_page import acl, navigation, response, _, bootstrap, html
 
 blueprint = flask.Blueprint('campaign_tree', __name__, static_folder='static', url_prefix='/campaign-tree')
 
@@ -35,30 +35,26 @@ def index_page():
                         'Start Editing']],
                 sections=[
                     [_.p['Match results: ',
-                         _.label(class_="radio-inline")[
-                             _.input(type='radio', name="searchOptions", id='fuzzy', value='fuzzy', checked='checked'),
-                             'Fuzzy'],
-                         '    ',
-                         _.label(class_="radio-inline")[
-                             _.input(type='radio', name="searchOptions", id='exact', value='exact'),
-                             'Exact'],
+                         '&nbsp; ',
+                         _.input(type='radio', name="searchOptions", id='fuzzy', value='fuzzy', checked='checked'),
+                         ' Fuzzy&nbsp; ',
+                         _.input(type='radio', name="searchOptions", id='exact', value='exact'),
+                         ' Exact',
                      ],
                      _.p['Sort results by: ',
-                         _.label(class_="radio-inline")[''],
-                         _.input(type='checkbox', name="sortOptions", id='sort-level_1', value='level_1')[
-                             '1st level'],
-                         '    ',
-                         _.label(class_="radio-inline"),
+                         '&nbsp; ',
+                         _.input(type='checkbox', name="sortOptions", id='sort-level_1', value='level_1'),
+                         ' 1st level&nbsp; ',
                          _.input(type='checkbox', name="sortOptions", id='sort-number_of_clicks_last_two_weeks',
-                                 value='number_of_clicks_last_two_weeks', checked='checked')[
-                             '# Clicks last 2 Weeks'],
-                         '    ',
-                         _.label(class_="radio-inline"),
+                                 value='number_of_clicks_last_two_weeks', checked='checked'),
+                         ' # Clicks last 2 Weeks&nbsp; ',
                          _.input(type='checkbox', name="sortOptions", id='sort-number_of_clicks_all_time',
-                                 value='number_of_clicks_all_time')[
-                             '# Clicks all time']]],
-                    _.div(class_='input-group'), bootstrap.table(
+                                 value='number_of_clicks_all_time'),
+
+                         ' # Clicks all time&nbsp; ']],
+                    bootstrap.table(
                         id='campaign-tree-table',
+
                         headers=[_.input(id=level, class_='form-control search-col editable',
                                          type='text', data_level=level, style='min-width:90px', placeholder=level)[' ']
                                  for
@@ -94,7 +90,7 @@ def count():
 @blueprint.route('/save', methods=['POST'])
 @acl.require_permission(acl_resource)
 def save():
-    data=campaign_tree.save(flask.request.get_json())
+    data = campaign_tree.save(flask.request.get_json())
     flask.flash(
         "Successfully saved" + str(data[0][7:-1]) + " Campaigns " + " where we " + str(data[1]),
         category='success')
