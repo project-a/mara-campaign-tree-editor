@@ -22,7 +22,7 @@ def navigation_entry():
 @acl.require_permission(acl_resource)
 def index_page():
     return response.Response(
-        title='Campaign Tree',
+        title='Campaign Tree Editor',
         js_files=[flask.url_for('campaign_tree.static', filename='campaign-tree.js')],
         css_files=[flask.url_for('campaign_tree.static', filename='campaign-tree.css')],
         html=[
@@ -30,9 +30,6 @@ def index_page():
                 id='campaign-tree-card',
                 header_left=_.span(id="table-title")['First ', _.b['search'], ' to select campaigns, then ',
                                                      _.b['edit'], ' all campaigns of the search result'],
-                header_right=_.span(id="edit-mode")[
-                    _.button(type='button', class_="btn btn-success", onclick='campaignTree.startEdit()')[
-                        'Start Editing']],
                 sections=[
                     [_.p['Match results: ',
                          '&nbsp; ',
@@ -43,15 +40,15 @@ def index_page():
                      ],
                      _.p['Sort results by: ',
                          '&nbsp; ',
-                         _.input(type='checkbox', name="sortOptions", id='sort-level_1', value='level_1'),
-                         ' 1st level&nbsp; ',
-                         _.input(type='checkbox', name="sortOptions", id='sort-number_of_clicks_last_two_weeks',
-                                 value='number_of_clicks_last_two_weeks', checked='checked'),
-                         ' # Clicks last 2 Weeks&nbsp; ',
-                         _.input(type='checkbox', name="sortOptions", id='sort-number_of_clicks_all_time',
-                                 value='number_of_clicks_all_time'),
+                         _.input(type='checkbox', name="sortOptions", id='sort-1', value='1'),
+                         f' {config.levels()[0]}&nbsp;&nbsp; ',
+                         _.input(type='checkbox', name="sortOptions", id='sort-touchpoints_last_two_weeks',
+                                 value='touchpoints_last_two_weeks', checked='checked'),
+                         ' # Touchpoints last 2 Weeks&nbsp;&nbsp; ',
+                         _.input(type='checkbox', name="sortOptions", id='sort-all_time_touchpoints',
+                                 value='all_time_touchpoints'),
 
-                         ' # Clicks all time&nbsp; ']],
+                         ' # Touchpoints all time&nbsp; ']],
                     bootstrap.table(
                         id='campaign-tree-table',
 
@@ -72,7 +69,8 @@ document.addEventListener('DOMContentLoaded', function() {
                      + flask.url_for('campaign_tree.index_page') + '''", '''
                      + json.dumps(config.levels()) + ''');
 });'''],
-            html.spinner_js_function()])
+            html.spinner_js_function()]
+      )
 
 
 @blueprint.route('/search', methods=['POST'])
@@ -90,8 +88,4 @@ def count():
 @blueprint.route('/save', methods=['POST'])
 @acl.require_permission(acl_resource)
 def save():
-    data = campaign_tree.save(flask.request.get_json())
-    flask.flash(
-        "Successfully saved" + str(data[0][7:-1]) + " Campaigns " + " where we " + str(data[1]),
-        category='success')
-    return flask.jsonify(data)
+    return flask.jsonify(campaign_tree.save(flask.request.get_json()))

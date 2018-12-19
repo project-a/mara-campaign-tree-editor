@@ -12,7 +12,7 @@ var CampaignTree = function (baseUrl, levels) {
     var numberOfResults = 0;
     var numberOfResultsNotDisplayed = 0;
 
-    var sortOptions = ['level_1', 'number_of_clicks_last_two_weeks', 'number_of_clicks_all_time'];
+    var sortOptions = ['1', 'touchpoints_last_two_weeks', 'all_time_touchpoints'];
 
     function search(limit_) {
         limit = limit_ ? limit_ : defaultLimit;
@@ -76,7 +76,7 @@ var CampaignTree = function (baseUrl, levels) {
         }
         var request = {
             'filters': filters,
-            'campaign_code' : '',
+            'campaign_code': '',
             'search-mode': $('input[name="searchOptions"]:checked').val()
         };
         for (var level in levels) {
@@ -100,10 +100,10 @@ var CampaignTree = function (baseUrl, levels) {
 
             var tr = $('<tr/>');
             for (var levelKey in row[0]) {
-                var cellContent =$('<td class="data-col" data-type="' + levels[levelKey] + '"><a href="javascript:void(0)">' + row[0][levelKey] + '</a></td>');
+                var cellContent = $('<td class="data-col" data-type="' + levels[levelKey] + '"><a href="javascript:void(0)">' + row[0][levelKey] + '</a></td>');
                 tr.append(cellContent);
             }
-            var cellContent =$('<td class="data-col" data-type=campaign_code><a href="javascript:void(0)">' + row[1] + '</a></td>');
+            var cellContent = $('<td class="data-col" data-type=campaign_code><a href="javascript:void(0)">' + row[1] + '</a></td>');
             tr.append(cellContent);
 
             trs.push(tr);
@@ -113,7 +113,7 @@ var CampaignTree = function (baseUrl, levels) {
         $('#campaign-tree-table tbody').empty().append(trs);
 
         // Bind row events for search mode
-         bindRowEvents();
+        bindRowEvents();
     }
 
     // Display results from the search query
@@ -134,7 +134,7 @@ var CampaignTree = function (baseUrl, levels) {
         ;
 
         $('#search-result-counts').html(text);
-    }
+    };
 
     // Remove search term for level and start a new search
     var clearSearchLevel = function (level) {
@@ -207,8 +207,10 @@ var CampaignTree = function (baseUrl, levels) {
     var cancelEdit = function () {
         // Change UI
         $('#warning').html('');
-        $('#edit-mode').html('<div class="btn-group"><button type="button" class="btn btn-success" onclick="campaignTree.startEdit()">Start editing</button></div>');
-        $('div.campaign-tree th').removeClass('in-edit-mode');
+        $('#mara-page-header div.action-buttons').html(
+            '<div class="btn-group"><button type="button" class="btn btn-success" onclick="campaignTree.startEdit()">Start editing</button></div>'
+        );
+        $('#campaign-tree-table th').removeClass('in-edit-mode');
         $('.search-col.non-editable').prop('readonly', false);
         $('#sort-mode').show();
 
@@ -237,10 +239,10 @@ var CampaignTree = function (baseUrl, levels) {
         bindEditEvents();
 
         // Change UI
-        $('#edit-mode').html(
+        $('#mara-page-header div.action-buttons').html(
             '<div class="btn-group">' +
             '<a id="action-cancel" href="javascript:campaignTree.cancelEdit();"><button type="button" class="btn btn-danger"><span class="icon-trash"> </span>Cancel editing</button></a> ' +
-            '<a id="action-save" href="javascript:campaignTree.saveEdit();"><button type="button" class="btn btn-primary"><span class="icon-save"> </span>Save changes</button></a>' +
+            '&nbsp;&nbsp;&nbsp; <a id="action-save" href="javascript:campaignTree.saveEdit();"><button type="button" class="btn btn-primary"><span class="icon-save"> </span>Save changes</button></a>' +
             '</div>'
         );
         $('#sort-mode').hide();
@@ -258,15 +260,14 @@ var CampaignTree = function (baseUrl, levels) {
         $('.input-icon[data-editable="non-editable"]').each(function () {
             $(this).html('<span class="icon-edit" style="opacity: 0.5;"></span>');
         });
-        $('div.campaign-tree th').addClass('in-edit-mode');
+        $('#campaign-tree-table th').addClass('in-edit-mode');
         $('.search-col.non-editable').prop('readonly', true);
     };
 
 
     var displayChange = function (data) {
         //show the warnings and messages
-        $('#table-title').html('<span style="color: green !important; font-weight: bold;">Successfully saved ' + String(data[0].slice(7,data[0].length)) + ' Campaigns' +
-            ' where we ' + data[1] + ' .</span>');
+        showAlert(data, 'success');
         cancelEdit();
         search();
     };
@@ -291,7 +292,7 @@ var CampaignTree = function (baseUrl, levels) {
             request['filters'][level] = $('#' + levels[level]).attr('data-val');
             request['changes'][level] = $('#' + levels[level]).val();
         }
-        request['campaign_code'] = $('#campaign_code').val();
+        request['campaign_code'] = $('#campaign_code').attr('data-val');
 
 
         // Send both as POST parameters to the save action
@@ -315,9 +316,15 @@ var CampaignTree = function (baseUrl, levels) {
         search();
     });
 
-    search();
+    cancelEdit();
 
-    return {search: search, startEdit: startEdit, cancelEdit: cancelEdit, saveEdit: saveEdit,clearSearchLevel:clearSearchLevel}
+    return {
+        search: search,
+        startEdit: startEdit,
+        cancelEdit: cancelEdit,
+        saveEdit: saveEdit,
+        clearSearchLevel: clearSearchLevel
+    }
 };
 
 

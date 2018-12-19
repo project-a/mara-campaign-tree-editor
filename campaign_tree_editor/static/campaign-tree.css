@@ -1,1 +1,18 @@
 
+#campaign-tree-table > tbody >tr:first-child > td {
+    padding-top: 10px;
+    padding-bottom: 20px !important;
+    color: #aaa;
+}
+
+#campaign-tree-table th.in-edit-mode {
+    background-color: #0275d8;
+}
+
+#campaign-tree-table thead th {
+    border-bottom: none;
+}
+
+#campaign-tree-card ::placeholder {
+    color: #aaa;
+}

@@ -70,31 +70,30 @@ DELETE FROM campaign_tree WHERE campaign_code NOT IN (SELECT campaign_code FROM 
         return True  # this is important for mara ETL
 
 
-def replace_external_sortnames_with_internal(sortcolumn):
-    """Map external sort column names to internal names"""
-    return [column.replace('number_of_clicks_last_two_weeks', 'touchpoints_last_two_weeks').replace(
-        'number_of_clicks_all_time', 'all_time_touchpoints').replace('level_1', '1')
-            for column in sortcolumn]
 
-
-def build_search_mode_query(request):
+def _build_where_clause(request):
     """builds the search mode query depending on if search is fuzzy or exact"""
-    search_query = ''
-    if request["search-mode"] == 'fuzzy':  # searching
-        for index, search in enumerate(request["filters"]):
-            if search:
-                search_query += f"""
-    AND levels[{index + 1}] ILIKE '%{search}%'"""
-        if request["campaign_code"]:
-            search_query += f""" AND campaign_code ILIKE '%{request['campaign_code']}%'"""
-    else:  # exact
-        for index, search in enumerate(request["filters"]):
-            if search:
-                search_query += f"""
-            AND levels[{index + 1}] = '{search}'"""
-        if request["campaign_code"]:
-            search_query += f""" AND campaign_code = '{request['campaign_code']}'"""
-    return search_query
+    variables = []
+    conditions = []
+    def _add_clause(column, value):
+        if request["search-mode"] == 'fuzzy':
+            conditions.append(f'{column} ILIKE %s')
+            variables.append(f'%{value}%')
+        else:
+            conditions.append(f'{column} = %s')
+            variables.append(value)
+
+    for index, search in enumerate(request["filters"]):
+        if search:
+            _add_clause(f'levels[{index + 1}]', search)
+
+    if request['campaign_code']:
+        _add_clause('campaign_code', request['campaign_code'])
+
+    if conditions:
+        return 'WHERE ' + ' AND '.join(conditions), variables
+    else:
+        return '', []
 
 
 def search(request):
@@ -102,70 +101,58 @@ def search(request):
     query = '''
 SELECT levels, campaign_code 
 FROM campaign_tree
-WHERE TRUE '''
+'''
 
-    search_query = build_search_mode_query(request)
+    search_query, variables = _build_where_clause(request)
     query += search_query
 
-    if len(request["sort-columns"]) > 0:  # sorting
-        query += """ ORDER BY """
-        for index, sort_columns in enumerate(replace_external_sortnames_with_internal(request["sort-columns"])):
-            if index == 0:
-                query += f""" {sort_columns}"""
-            else:
-                query += f""", {sort_columns}"""
-    #  Add limit
+    sort_columns = [sort_column for sort_column in request["sort-columns"]
+                    if sort_column in ['touchpoints_last_two_weeks', 'all_time_touchpoints', '1']]
+
+
+    if sort_columns:
+        query += ' ORDER BY ' + ', '.join(sort_columns)
+
     query += f""" LIMIT {int(request["limit"])}"""
 
     with mara_db.postgresql.postgres_cursor_context('mara') as cursor:  # type: psycopg2.extensions.cursor
-        cursor.execute(query)
+        print(query)
+        cursor.execute(query, variables)
         return cursor.fetchall() or []
 
 
 def count(request):
     """Count number of found campaigns"""
     query = '''
-SELECT Count(campaign_code) 
+SELECT COUNT(campaign_code) 
 FROM campaign_tree
-WHERE TRUE '''
+'''
 
-    search_query = build_search_mode_query(request)
+    search_query, variables  = _build_where_clause(request)
     query += search_query
 
     with mara_db.postgresql.postgres_cursor_context('mara') as cursor:  # type: psycopg2.extensions.cursor
-        cursor.execute(query)
+        cursor.execute(query, variables)
         return cursor.fetchall() or []
 
 
 def save(request):
     """Search campaigns either on exact or fuzzy(ilike) matching and order results by touchpoint count"""
-    query = '''
-    UPDATE campaign_tree
-    '''
+    if any(request["changes"]):
 
-    first = True
-    change_query = ''
-    for index, change in enumerate(request["changes"]):
-        if change:
-            if first:
-                change_query += f"""
-        SET levels[{index + 1}] = '{change}'"""
-                first = False
-            else:
-                change_query += f"""
-        , levels[{index + 1}] = '{change}'"""
+        query = 'UPDATE campaign_tree SET '
 
-    query += change_query
-    query += '''
-     WHERE TRUE 
-    '''
-    search_query = build_search_mode_query(request)
-    query += search_query
-    print(query)
+        query += ', '.join([f'levels[{index + 1}] = %s'
+                           for index, change in enumerate(request["changes"])
+                           if change])
+        where_clause, variables = _build_where_clause(request)
+        query += ' ' + where_clause
 
-    with mara_db.postgresql.postgres_cursor_context('mara') as cursor:  # type: psycopg2.extensions.cursor
-        cursor.execute(query)
-        return [cursor.statusmessage or [], change_query]
+        with mara_db.postgresql.postgres_cursor_context('mara') as cursor:  # type: psycopg2.extensions.cursor
+            cursor.execute(query, tuple([change for change in request['changes'] if change] + variables))
+            return f'Successfully updated {cursor.rowcount} rows: <tt>{str(cursor.query.decode("utf-8"))}</tt>'
+    else:
+        return 'No changes to be made'
 
 
 if __name__ == "__main__":
