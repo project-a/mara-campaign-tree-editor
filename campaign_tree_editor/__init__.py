@@ -1,13 +1,26 @@
-from campaign_tree_editor import config, campaign_tree, views
 
-MARA_CONFIG_MODULES = [config]
+def MARA_CONFIG_MODULES():
+    from . import config
+    return [config]
 
-MARA_CLICK_COMMANDS = []
+def MARA_CLICK_COMMANDS():
+    return []
 
-MARA_AUTOMIGRATE_SQLALCHEMY_MODELS = [campaign_tree.CampaignTree]
+def MARA_AUTOMIGRATE_SQLALCHEMY_MODELS():
+    from . import campaign_tree
+    return [campaign_tree.CampaignTree]
 
-MARA_FLASK_BLUEPRINTS = [views.blueprint]
 
-MARA_NAVIGATION_ENTRY_FNS = [views.navigation_entry]
+def MARA_FLASK_BLUEPRINTS():
+    from . import views
+    return [views.blueprint]
 
-MARA_ACL_RESOURCES = [views.acl_resource]
+
+def MARA_NAVIGATION_ENTRIES():
+    from . import views
+    return [views.navigation_entry()]
+
+
+def MARA_ACL_RESOURCES():
+    from . import views
+    return [views.acl_resource]
