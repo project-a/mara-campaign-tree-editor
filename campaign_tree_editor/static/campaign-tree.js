@@ -32,7 +32,7 @@ var CampaignTree = function (baseUrl, levels) {
             'search-mode': $('input[name="searchOptions"]:checked').val()
         };
         for (var level in levels) {
-            request['filters'][level] = $('#' + levels[level]).val();
+            request['filters'][level] = $('#level-' + level).val();
         }
         request['campaign_code'] = $('#campaign_code').val();
         for (var i in sortOptions) {
@@ -59,7 +59,7 @@ var CampaignTree = function (baseUrl, levels) {
             dataType: 'json'
         });
 
-        $('#campaign-tree-table tbody').html(spinner());
+        $('#campaign-tree-table tbody tr').css('opacity', 0.5);
     }
 
     function displaySearchResult(data) {
@@ -80,7 +80,7 @@ var CampaignTree = function (baseUrl, levels) {
             'search-mode': $('input[name="searchOptions"]:checked').val()
         };
         for (var level in levels) {
-            request['filters'][level] = $('#' + levels[level]).val();
+            request['filters'][level] = $('#level-' + level).val();
         }
         request['campaign_code'] = $('#campaign_code').val();
 
@@ -100,10 +100,10 @@ var CampaignTree = function (baseUrl, levels) {
 
             var tr = $('<tr/>');
             for (var levelKey in row[0]) {
-                var cellContent = $('<td class="data-col" data-type="' + levels[levelKey] + '"><a href="javascript:void(0)">' + row[0][levelKey] + '</a></td>');
+                var cellContent = $('<td class="data-col" data-level="' + levelKey + '"><a href="javascript:void(0)">' + row[0][levelKey] + '</a></td>');
                 tr.append(cellContent);
             }
-            var cellContent = $('<td class="data-col" data-type=campaign_code><a href="javascript:void(0)">' + row[1] + '</a></td>');
+            var cellContent = $('<td class="data-col" data-level=campaign_code><a href="javascript:void(0)">' + row[1] + '</a></td>');
             tr.append(cellContent);
 
             trs.push(tr);
@@ -136,17 +136,10 @@ var CampaignTree = function (baseUrl, levels) {
         $('#search-result-counts').html(text);
     };
 
-    // Remove search term for level and start a new search
-    var clearSearchLevel = function (level) {
-        $('#' + level).val('');
-        updateClearButtons();
-        search();
-    };
 
 // Start search while typing
     var bindSearchEvents = function () {
         $('.search-col').unbind().keyup(function () {
-            updateClearButtons();
             search();
         });
 
@@ -161,14 +154,15 @@ var CampaignTree = function (baseUrl, levels) {
 // Update columns in edit mode while typing
     var bindEditEvents = function () {
         var editAble = levels;
-        for (var level in editAble) {
+        for (var levelIndex in levels) {
             (function (l) {
-                $('#' + l).keyup(function () {
+                $('#level-' + l).keyup(function () {
                     var inp = $(this).val();
+                    console.log(inp);
                     $(this).val(inp.replace(/\|,|\.|;|\?/g, ''));
-                    $('.data-col[data-type="' + l + '"]').html($(this).val());
+                    $('.data-col[data-level="' + l + '"]').html($(this).val());
                 });
-            })(levels[level]);
+            })(levelIndex);
         }
     };
 
@@ -180,8 +174,7 @@ var CampaignTree = function (baseUrl, levels) {
 // Start search when clicking on a cell
     var bindRowEvents = function () {
         $('.data-col').click(function () {
-            $('#' + $(this).attr('data-type')).val($(this).text());
-            updateClearButtons();
+            $('#level-' + $(this).attr('data-level')).val($(this).text());
             search();
         });
     };
@@ -191,15 +184,6 @@ var CampaignTree = function (baseUrl, levels) {
         $('.data-col').unbind();
     };
 
-    var updateClearButtons = function () {
-        $('.input-icon').each(function () {
-            if ($('#' + $(this).attr('data-level')).val()) {
-                $(this).html('<a href="javascript:campaignTree.clearSearchLevel(\'' + $(this).attr('data-level') + '\')"><span class="icon-remove" style="opacity: 0.5;"> </span></a>');
-            } else {
-                $(this).html('&nbsp;&nbsp;');
-            }
-        });
-    };
     // Edit mode
 // ---------
 
@@ -222,7 +206,6 @@ var CampaignTree = function (baseUrl, levels) {
         $('.search-col').each(function () {
             $(this).val($(this).attr('data-val'));
         });
-        updateClearButtons();
         search();
     };
 
@@ -258,7 +241,7 @@ var CampaignTree = function (baseUrl, levels) {
             $(this).html('<span class="icon-edit" style="color: green; font-weight: bold;"></span>');
         });
         $('.input-icon[data-editable="non-editable"]').each(function () {
-            $(this).html('<span class="icon-edit" style="opacity: 0.5;"></span>');
+            $(this).html('<span class="icon-edit" style="opacity: 0.3;"></span>');
         });
         $('#campaign-tree-table th').addClass('in-edit-mode');
         $('.search-col.non-editable').prop('readonly', true);
@@ -289,8 +272,8 @@ var CampaignTree = function (baseUrl, levels) {
         };
 
         for (var level in levels) {
-            request['filters'][level] = $('#' + levels[level]).attr('data-val');
-            request['changes'][level] = $('#' + levels[level]).val();
+            request['filters'][level] = $('#level-' + level).attr('data-val');
+            request['changes'][level] = $('#level-' + level).val();
         }
         request['campaign_code'] = $('#campaign_code').attr('data-val');
 
@@ -305,6 +288,8 @@ var CampaignTree = function (baseUrl, levels) {
             dataType: 'json'
         });
     };
+
+    $('#campaign-tree-table').removeClass('mara-table-float-header');
 
     $('.search-col').unbind().keyup(function () {
         search();
@@ -322,8 +307,7 @@ var CampaignTree = function (baseUrl, levels) {
         search: search,
         startEdit: startEdit,
         cancelEdit: cancelEdit,
-        saveEdit: saveEdit,
-        clearSearchLevel: clearSearchLevel
+        saveEdit: saveEdit
     }
 };
 

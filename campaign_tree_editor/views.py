@@ -52,10 +52,10 @@ def index_page():
                     bootstrap.table(
                         id='campaign-tree-table',
 
-                        headers=[_.input(id=level, class_='form-control search-col editable',
-                                         type='text', data_level=level, style='min-width:90px', placeholder=level)[' ']
+                        headers=[_.input(id=f'level-{i}', class_='form-control search-col editable',
+                                         type='text', data_level=level, placeholder=level, style='min-width:90px')[' ']
                                  for
-                                 level in config.levels()] +
+                                 i, level in enumerate(config.levels())] +
                                 [_.input(id='campaign_code', class_='form-control search-col non-editable',
                                          type='text', data_level='campaign_code', style='min-width:90px',
                                          placeholder='Campaign code')[' ']],

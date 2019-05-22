@@ -116,7 +116,6 @@ FROM campaign_tree
     query += f""" LIMIT {int(request["limit"])}"""
 
     with mara_db.postgresql.postgres_cursor_context('mara') as cursor:  # type: psycopg2.extensions.cursor
-        print(query)
         cursor.execute(query, variables)
         return cursor.fetchall() or []
 
