@@ -56,7 +56,7 @@ def index_page():
                                          type='text', data_level=level, placeholder=level, style='min-width:90px')[' ']
                                  for
                                  i, level in enumerate(config.levels())] +
-                                [_.input(id='campaign_code', class_='form-control search-col non-editable',
+                                [_.input(id='level-campaign_code', class_='form-control search-col non-editable',
                                          type='text', data_level='campaign_code', style='min-width:90px',
                                          placeholder='Campaign code')[' ']],
                         rows=[])

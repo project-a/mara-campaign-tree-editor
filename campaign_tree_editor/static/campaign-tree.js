@@ -34,7 +34,7 @@ var CampaignTree = function (baseUrl, levels) {
         for (var level in levels) {
             request['filters'][level] = $('#level-' + level).val();
         }
-        request['campaign_code'] = $('#campaign_code').val();
+        request['campaign_code'] = $('#level-campaign_code').val();
         for (var i in sortOptions) {
             var option = sortOptions[i];
             if ($('#sort-' + option).prop('checked')) {
@@ -82,7 +82,7 @@ var CampaignTree = function (baseUrl, levels) {
         for (var level in levels) {
             request['filters'][level] = $('#level-' + level).val();
         }
-        request['campaign_code'] = $('#campaign_code').val();
+        request['campaign_code'] = $('#level-campaign_code').val();
 
         currentCountRequest = $.ajax({
             type: "POST",
@@ -275,7 +275,7 @@ var CampaignTree = function (baseUrl, levels) {
             request['filters'][level] = $('#level-' + level).attr('data-val');
             request['changes'][level] = $('#level-' + level).val();
         }
-        request['campaign_code'] = $('#campaign_code').attr('data-val');
+        request['campaign_code'] = $('#level-campaign_code').attr('data-val');
 
 
         // Send both as POST parameters to the save action
