@@ -43,12 +43,12 @@ CREATE TEMPORARY TABLE dwh_campaign_code (
 INSERT INTO campaign_tree (campaign_code, levels, all_time_touchpoints, touchpoints_last_two_weeks)
 SELECT 
     cc.campaign_code, 
-    string_to_array(cc.campaign_code, {"%s"}),
+    (string_to_array(cc.campaign_code, {"%s"}))[1:{"%s"}],
     cc.all_time_touchpoints,
     cc.touchpoints_last_two_weeks
 FROM dwh_campaign_code cc
 LEFT JOIN campaign_tree USING (campaign_code)
-WHERE campaign_tree.campaign_code IS NULL""", (config.campaign_code_delimiter()))
+WHERE campaign_tree.campaign_code IS NULL""", (config.campaign_code_delimiter(), len(config.levels())))
 
         print('update existing campaign codes')
         cursor.execute("""
