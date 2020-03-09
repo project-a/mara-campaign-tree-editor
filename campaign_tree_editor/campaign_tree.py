@@ -136,12 +136,12 @@ FROM campaign_tree
 
 
 def save(request):
-    """Search campaigns either on exact or fuzzy(ilike) matching and order results by touchpoint count"""
+    """Update the column levels in campaign_tree table with the user's input from the data warehouse frontend."""
     if any(request["changes"]):
 
         query = 'UPDATE campaign_tree SET '
 
-        query += ', '.join([f'levels[{index + 1}] = %s'
+        query += ', '.join([f"""levels[{index + 1}] = trim(regexp_replace(%s, '\s+', ' ', 'g'))"""
                            for index, change in enumerate(request["changes"])
                            if change])
         where_clause, variables = _build_where_clause(request)
