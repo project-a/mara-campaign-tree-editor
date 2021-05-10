@@ -1,19 +1,14 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='campaign-tree-editor',
-    version='1.0.0',
+    name='mara-campaign-tree-editor',
+    version='2.0.0',
 
-    description="Tool to find and edit marketing campaign names",
+    description="Flask based UI for correcting wrong UTM parameters or changing campaign structure",
 
     install_requires=[
         'mara-page>=1.2.3',
         'mara-db>=2.0.0'
-    ],
-
-    dependency_links=[
-        'git+ssh://git@github.com/mara/mara-page.git@1.2.3#egg=mara-page-1.2.3',
-        'git+ssh://git@github.com/mara/mara-db.git@2.0.0#egg=mara-db-2.0.0'
     ],
 
     packages=find_packages(),
